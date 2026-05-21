@@ -1,0 +1,13 @@
+name = "Tartaros"
+uuid = "04f78ae1-ffe2-4bb2-8f90-a172d7da432b"
+authors = ["Jan Swierczek-Jereczek"]
+version = "0.0.1"
+
+[compat]
+julia = "1.12"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
