@@ -1,3 +1,6 @@
 [deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+LazyGrids = "7031d0ef-c40d-4431-b2f8-61a8d2f650db"
+NCDatasets = "85f8d34a-cbdd-5861-8df4-14fed0d494ab"
 Tartaros = "04f78ae1-ffe2-4bb2-8f90-a172d7da432b"
