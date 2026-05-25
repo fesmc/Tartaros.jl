@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Bedrock diffusion models · Tartaros.jl</title><meta name="title" content="Bedrock diffusion models · Tartaros.jl"/><meta property="og:title" content="Bedrock diffusion models · Tartaros.jl"/><meta property="twitter:title" content="Bedrock diffusion models · Tartaros.jl"/><meta name="description" content="Documentation for Tartaros.jl."/><meta property="og:description" content="Documentation for Tartaros.jl."/><meta property="twitter:description" content="Documentation for Tartaros.jl."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="https://fonts.googleapis.com/css?family=Montserrat|Source+Code+Pro&amp;display=swap" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="Tartaros.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">Tartaros.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Examples</span><ul><li class="is-active"><a class="tocitem" href>Bedrock diffusion models</a><ul class="internal"><li><a class="tocitem" href="#Scenario"><span>Scenario</span></a></li><li><a class="tocitem" href="#Using-a-GHF-model"><span>Using a GHF model</span></a></li><li><a class="tocitem" href="#Comparison-with-other-GHF-models"><span>Comparison with other GHF models</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../../API_public/">API</a></li><li><a class="tocitem" href="../../references/">References</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>Bedrock diffusion models</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Bedrock diffusion models</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/fesmc/Tartaros.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/fesmc/Tartaros.jl/blob/main/docs/src/examples/ghf-models.jl" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="GHF-Models"><a class="docs-heading-anchor" href="#GHF-Models">GHF Models</a><a id="GHF-Models-1"></a><a class="docs-heading-anchor-permalink" href="#GHF-Models" title="Permalink"></a></h1><p>Geothermal heat flux (GHF) at the ice base is not static: it responds to changes in basal ice temperature through the thermal inertia of the lithosphere. Tartaros.jl provides several models that capture different levels of this physics, all as subtypes of <a href="../../API_public/#Tartaros.AbstractGHF"><code>AbstractGHF</code></a> advanced via <a href="../../API_public/#Tartaros.ghf!"><code>ghf!</code></a>.</p><h2 id="Scenario"><a class="docs-heading-anchor" href="#Scenario">Scenario</a><a id="Scenario-1"></a><a class="docs-heading-anchor-permalink" href="#Scenario" title="Permalink"></a></h2><p>We simulate a <strong>step-warming event</strong>: the ice base is initially cold (258 K) and warms abruptly to the pressure melting point (273 K) at t = 0, then stays there. This mimics the onset of basal melting, e.g. at the transition from a cold-based to a warm-based glacier.  We track how each model&#39;s GHF responds over 40,000 years — a span comparable to one glacial cycle and roughly two thermal relaxation timescales of the lithosphere column.</p><pre><code class="language-julia hljs">using Tartaros
+using CairoMakie
+
+# Physical parameters — typical continental crust
+k     = 3.0       # thermal conductivity  [W m⁻¹ K⁻¹]
+kappa = 1e-6      # thermal diffusivity   [m² s⁻¹]
+H     = 2_000.0   # lithosphere thickness [m]
+nz    = 10;       # vertical levels in the diffusion column</code></pre><h2 id="Using-a-GHF-model"><a class="docs-heading-anchor" href="#Using-a-GHF-model">Using a GHF model</a><a id="Using-a-GHF-model-1"></a><a class="docs-heading-anchor-permalink" href="#Using-a-GHF-model" title="Permalink"></a></h2><p>All GHF models share the same interface: construct the model once, then advance it with <a href="../../API_public/#Tartaros.ghf!"><code>ghf!</code></a> at each time step. For <a href="../../API_public/#Tartaros.DiffusionGHF"><code>DiffusionGHF</code></a>, which explicitly integrates the 1-D lithospheric heat equation, the call signature is:</p><pre><code class="nohighlight hljs">ghf!(ghf_field, T_ice_base, model, dt)</code></pre><p><code>ghf_field</code> and <code>T_ice_base</code> are arrays over the horizontal model grid; <code>model</code> carries the full 3-D column state and is updated in place alongside <code>ghf_field</code>. This maps directly onto an ice-sheet coupling loop where <code>T_ice_base</code> is provided by the ice dynamics solver at each time step.</p><p>Below we build a single-column <code>DiffusionGHF</code>, subject it to an abrupt 15 K warming of the ice base, and observe how the lithospheric temperature profile responds.</p><pre><code class="language-julia hljs"># Construct DiffusionGHF — T_mantle is inferred from ghf_ref and the initial T_ice_base
+ghf0 = fill(0.060, 1, 1)   # reference GHF [W m⁻²]
+T_b0 = fill(258.0, 1, 1)   # initial basal temperature [K]
+T_b1 = fill(273.0, 1, 1)   # post-warming temperature [K]
+dif  = DiffusionGHF(ghf0, T_b0; k, kappa, H_litho = H, nz)
+
+# Integrate 40 × 500 yr = 20 kyr; record the column at selected snapshots
+snap_yr  = [0, 500, 2_000, 6_000, 20_000]
+dt_snap  = 500 * 365.25 * 24 * 3600      # 500-yr time step [s]
+T_snap   = zeros(nz, length(snap_yr))
+T_snap[:, 1] .= dif.T_col[1, 1, :]      # t = 0 profile
+gbuf = zeros(1, 1)
+for step in 1:40
+    ghf!(gbuf, T_b1, dif, dt_snap)
+    si = findfirst(==(step * 500), snap_yr)
+    si !== nothing &amp;&amp; (T_snap[:, si] .= dif.T_col[1, 1, :])
+end
+depth_snap = H .* (1 .- dif.zeta)
+
+# Visualise how the thermal signal diffuses downward through the lithosphere
+fig_usage = Figure(size = (480, 400))
+ax_usage  = Axis(fig_usage[1, 1];
+    xlabel       = &quot;Temperature (K)&quot;,
+    ylabel       = &quot;Depth below ice base (m)&quot;,
+    title        = &quot;DiffusionGHF: lithosphere temperature column&quot;,
+    yreversed    = true,
+    xgridvisible = false)
+snap_cls = cgrad(:plasma, length(snap_yr) + 2; categorical = true)
+for (i, yr) in enumerate(snap_yr)
+    label = yr == 0 ? &quot;initial (t = 0)&quot; : &quot;t = $(yr ÷ 1000) kyr&quot;
+    lines!(ax_usage, T_snap[:, i], depth_snap;
+        color = snap_cls[i + 1], linewidth = 2, label = label)
+end
+axislegend(ax_usage; position = :lb, framevisible = true)
+fig_usage</code></pre><img src="e6a28f3f.png" alt="Example block output"/><p>The thermal relaxation timescale of the column is approximately <span>$\tau \approx H^2 / (\pi^2 \kappa) \approx 12{,}700$</span> years for these parameters.</p><h2 id="Comparison-with-other-GHF-models"><a class="docs-heading-anchor" href="#Comparison-with-other-GHF-models">Comparison with other GHF models</a><a id="Comparison-with-other-GHF-models-1"></a><a class="docs-heading-anchor-permalink" href="#Comparison-with-other-GHF-models" title="Permalink"></a></h2><p><code>DiffusionGHF</code> is the most physically complete model of the six currently implemented in Tartaros.jl. Its computational costs is relatively low, especially since it is GPU-compatible. However, other models may be preferred in some contexts, e.g. for their analytical tractability, to save computational resources or to isolate specific feedbacks. Below we compare the GHF time series of all six models in response to the same step warming. The table summarises the key physics and long-term targets of each model.</p><table><tr><th style="text-align: right">Model</th><th style="text-align: right">Physics</th><th style="text-align: right">Long-term target</th></tr><tr><td style="text-align: right"><code>PrescribedGHF</code></td><td style="text-align: right">No feedback</td><td style="text-align: right">60 mW m⁻² (unchanged)</td></tr><tr><td style="text-align: right"><code>SteadyStateGHF</code></td><td style="text-align: right">Instantaneous Fourier</td><td style="text-align: right">37.5 mW m⁻² (new steady state)</td></tr><tr><td style="text-align: right"><code>ThermalRelaxationGHF</code></td><td style="text-align: right">Exponential lag</td><td style="text-align: right">37.5 mW m⁻²</td></tr><tr><td style="text-align: right"><code>InfiniteColumnGHF</code></td><td style="text-align: right">Semi-infinite (1/√t return)</td><td style="text-align: right">60 mW m⁻² (algebraic)</td></tr><tr><td style="text-align: right"><code>FiniteColumnGHF</code></td><td style="text-align: right">Eigenfunction expansion</td><td style="text-align: right">60 mW m⁻² (exponential)</td></tr><tr><td style="text-align: right"><code>DiffusionGHF</code></td><td style="text-align: right">Full 1-D diffusion</td><td style="text-align: right">60 mW m⁻² (numerical)</td></tr></table><p>The three analytical models (<code>InfiniteColumnGHF</code>, <code>FiniteColumnGHF</code>) and <code>DiffusionGHF</code> all use a fixed Neumann condition at the base (prescribed mantle flux), so their long-term limit is the original <span>$G_\text{ref} = 60$</span> mW m⁻². The key difference is the return timescale: the semi-infinite formula decays algebraically as <span>$1/\sqrt{t}$</span> whereas the eigenfunction expansion and numerical diffusion model relax exponentially once the thermal signal has propagated through the full column depth.</p><p><code>SteadyStateGHF</code> and <code>ThermalRelaxationGHF</code> instead hold <span>$T_\text{mantle}$</span> fixed (effectively a Dirichlet bottom BC), so they converge to the new steady-state flux 37.5 mW m⁻².</p><p>Values below −110 mW m⁻² at early times are clipped in the figure.</p><pre><code class="language-julia hljs"># Boundary conditions
+T_cold  = fill(258.0, 1, 1)   # initial ice-base temperature [K]
+T_warm  = fill(273.0, 1, 1)   # post-warming ice-base temperature [K]
+ghf_ref = fill(0.060, 1, 1)   # deep-mantle reference GHF [W m⁻²]
+
+# Build models — SteadyStateGHF and DiffusionGHF each infer their initial
+# lithospheric state from ghf_ref and T_cold, so all models begin at 60 mW m⁻².
+model_psc = PrescribedGHF(ghf_ref)
+model_ss  = SteadyStateGHF(ghf_ref, T_cold; k, H_litho = H)
+model_dif = DiffusionGHF(ghf_ref, T_cold; k, kappa, H_litho = H, nz)
+
+# ThermalRelaxationGHF: target = new steady-state GHF after warming; τ = H²/(π²κ)
+tau_s       = H^2 / (pi^2 * kappa)                                      # [s]
+ghf_target  = fill(k * (model_ss.T_mantle[1, 1] - T_warm[1]) / H, 1, 1) # [W m⁻²]
+model_relax = ThermalRelaxationGHF(ghf_target, ghf_ref; tau = tau_s)
+
+# InfiniteColumnGHF: semi-infinite solution; clock starts at 0 (the moment of the step)
+dT_step        = T_warm .- T_cold                      # 15 K step
+model_analytic = InfiniteColumnGHF(ghf_ref, dT_step; k, kappa, H_litho = H)
+
+# FiniteColumnGHF: eigenfunction expansion; same step and clock
+model_finite = FiniteColumnGHF(ghf_ref, dT_step; k, kappa, H_litho = H)
+
+# Time axis: 30,000 years at 500-year steps
+dt_yr = 500
+dt_s  = dt_yr * 365.25 * 24 * 3600   # seconds per step
+nstep = 80
+t_kyr = range(0.0, 40.0; length = nstep + 1)
+
+# Allocate result arrays — index 1 is the initial state (t = 0)
+ghf_psc     = zeros(nstep + 1)
+ghf_ss      = zeros(nstep + 1)
+ghf_dif     = zeros(nstep + 1)
+ghf_relax    = zeros(nstep + 1)
+ghf_analytic = zeros(nstep + 1)
+ghf_finite   = zeros(nstep + 1)
+ghf_psc[1]      = ghf_ref[1] * 1e3   # mW m⁻²
+ghf_ss[1]       = ghf_ref[1] * 1e3
+ghf_dif[1]      = ghf_ref[1] * 1e3
+ghf_relax[1]    = ghf_ref[1] * 1e3
+ghf_analytic[1] = ghf_ref[1] * 1e3
+ghf_finite[1]   = ghf_ref[1] * 1e3
+
+# Temperature-profile snapshots for the diffusion model at selected times
+snapshot_yr = [0, 3_000, 6_000, 12_000, 30_000]
+T_profiles  = zeros(nz, length(snapshot_yr))
+T_profiles[:, 1] .= model_dif.T_col[1, 1, :]   # initial (t = 0) profile
+
+# Time loop: apply T_warm from step 1 onward
+buf = zeros(1, 1)
+for step in 1:nstep
+    ghf!(buf, T_warm, model_psc)
+    ghf_psc[step + 1] = buf[1] * 1e3
+
+    ghf!(buf, T_warm, model_ss)
+    ghf_ss[step + 1]  = buf[1] * 1e3
+
+    ghf!(buf, T_warm, model_dif, dt_s)
+    ghf_dif[step + 1] = buf[1] * 1e3
+
+    ghf!(buf, T_warm, model_relax, dt_s)
+    ghf_relax[step + 1] = buf[1] * 1e3
+
+    ghf!(buf, T_warm, model_analytic, dt_s)
+    ghf_analytic[step + 1] = buf[1] * 1e3
+
+    ghf!(buf, T_warm, model_finite, dt_s)
+    ghf_finite[step + 1] = buf[1] * 1e3
+
+    si = findfirst(==(step * dt_yr), snapshot_yr)
+    if si !== nothing
+        T_profiles[:, si] .= model_dif.T_col[1, 1, :]
+    end
+end
+
+# Analytical final steady state — the asymptotic target for the diffusion and relaxation models
+tau_kyr      = round(tau_s / (365.25 * 24 * 3600 * 1_000); digits = 1)
+T_mantle     = model_ss.T_mantle[1, 1]
+ghf_ss_final = k * (T_mantle - T_warm[1]) / H
+T_final_ss   = @. T_warm[1] + ghf_ss_final * H * (1 - model_dif.zeta) / k
+
+depth = H .* (1 .- model_dif.zeta)   # sigma → depth below ice base [m]
+
+# ── Figure of GHF time series ────────────────────────────────────────
+fig = Figure(size = (1000, 500))
+
+# Panel 1
+ax1 = Axis(fig[1, 1];
+    xlabel       = &quot;Time (kyr)&quot;,
+    ylabel       = &quot;GHF (mW m⁻²)&quot;,
+    title        = &quot;Surface GHF response to a 15 K step warming of the ice base&quot;,
+    xgridvisible = false)
+
+hlines!(ax1, [ghf_ref[1] * 1e3];
+    color = :black, linestyle = :dot, linewidth = 1.5, label = &quot;Initial GHF (60 mW m⁻²)&quot;)
+lines!(ax1, t_kyr, ghf_psc;
+    color = :navyblue,      linewidth = 2, linestyle = :dash, label = &quot;Prescribed&quot;)
+lines!(ax1, t_kyr, ghf_ss;
+    color = :royalblue, linewidth = 2, label = &quot;Steady-state&quot;)
+lines!(ax1, t_kyr, ghf_dif;
+    color = :crimson,    linewidth = 2, label = &quot;Diffusion&quot;)
+lines!(ax1, t_kyr, ghf_relax;
+    color = :darkorange, linewidth = 2, linestyle = :dashdot,
+    label = &quot;Relaxation (τ = $(tau_kyr) kyr)&quot;)
+lines!(ax1, t_kyr[2:end], ghf_analytic[2:end];
+    color = :seagreen, linewidth = 2, linestyle = :dash,
+    label = &quot;Analytic (semi-∞, clipped)&quot;)
+lines!(ax1, t_kyr[2:end], ghf_finite[2:end];
+    color = :purple, linewidth = 2, linestyle = :dot,
+    label = &quot;Finite column (eigenfunction, clipped)&quot;)
+hlines!(ax1, [ghf_ss_final * 1e3];
+    color = :gray, linestyle = :dashdot, linewidth = 1.5,
+    label = &quot;New steady-state GHF ($(round(ghf_ss_final * 1e3, digits = 1)) mW m⁻²)&quot;)
+
+xlims!(ax1, 0, 40)
+ylims!(ax1, -110, 65)   # clip the semi-∞ singularity at early times
+axislegend(ax1; position = :rb, framevisible = true)
+
+fig</code></pre><img src="e2468db0.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../../API_public/">API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 25 May 2026 15:50">Monday 25 May 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
