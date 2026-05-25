@@ -1,9 +1,26 @@
+# TODO: this could be part of KryosTools.jl
+
+"""
+    AbstractSmoothingKernel
+
+Abstract type for spatial smoothing kernels. See [`ConstantSmoothingKernel`](@ref) and [`GaussianSmoothingKernel`](@ref).
+"""
 abstract type AbstractSmoothingKernel end
 
+"""
+    ConstantSmoothingKernel(; r = 5_000.0)
+
+Uniform (top-hat) smoothing kernel that averages all grid cells within radius `r` (metres).
+"""
 @kwdef struct ConstantSmoothingKernel{T} <: AbstractSmoothingKernel
     r::T = 5_000.0   # disk radius in meters
 end
 
+"""
+    GaussianSmoothingKernel(; r = 5_000.0)
+
+Gaussian smoothing kernel with standard deviation `r` (metres), truncated at 3σ.
+"""
 @kwdef struct GaussianSmoothingKernel{T} <: AbstractSmoothingKernel
     r::T = 5_000.0   # standard deviation in meters
 end
