@@ -1,3 +1,5 @@
+# TODO: this could be part of KryosTools.jl
+
 """
     AbstractSmoothingKernel
 
