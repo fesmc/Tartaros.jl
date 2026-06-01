@@ -10,3 +10,4 @@ Tartaros = "04f78ae1-ffe2-4bb2-8f90-a172d7da432b"
 
 [compat]
 CairoMakie = "0.15.10"
+DocumenterCitations = "1.4.1"
