@@ -10,4 +10,5 @@ Tartaros = "04f78ae1-ffe2-4bb2-8f90-a172d7da432b"
 
 [compat]
 CairoMakie = "0.15.10"
+DocumenterTools = "0.1.21"
 Literate = "2.21.0"
