@@ -7,3 +7,6 @@ LazyGrids = "7031d0ef-c40d-4431-b2f8-61a8d2f650db"
 Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 NCDatasets = "85f8d34a-cbdd-5861-8df4-14fed0d494ab"
 Tartaros = "04f78ae1-ffe2-4bb2-8f90-a172d7da432b"
+
+[compat]
+CairoMakie = "0.15.10"
