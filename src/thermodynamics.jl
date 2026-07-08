@@ -301,6 +301,7 @@ end
 # Advance a single temperature column by dt (implicit Euler, serial CPU).
 # Bottom BC: Neumann — prescribed heat flux Q_deep (ghost-node method).
 # Top BC: Dirichlet — prescribed temperature T_ice.
+# THIS FUNCTION IS NOT PERFORMANT AND IS ONLY USED FOR TESTING AND COMPARISON WITH THE KERNELABSTRACTIONS IMPLEMENTATION.
 function _solve_column!(col, Q_deep, T_ice, k, kappa, H_litho, H_prod, dt)
     nz = length(col)
     dz = H_litho / (nz - 1)
