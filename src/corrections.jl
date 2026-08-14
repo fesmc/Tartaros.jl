@@ -53,8 +53,18 @@ spatially-averaged counterpart `z_bed_mean` based on the specified [`AbstractGHF
 correct(ghf, z_bed, z_bed_mean, correction::AbstractGHFCorrection) =
     _correct(ghf, z_bed, z_bed_mean, correction)
 
-function correct(ghf::AbstractMatrix, z_bed, z_bed_mean, correction::AbstractGHFCorrection)
-    return map((g, z, z_mean) -> _correct(g, z, z_mean, correction), ghf, z_bed, z_bed_mean)
+function correct(
+    ghf::AbstractMatrix,
+    z_bed,
+    z_bed_mean,
+    correction::AbstractGHFCorrection,
+)
+    return map(
+        (g, z, z_mean) -> _correct(g, z, z_mean, correction),
+        ghf,
+        z_bed,
+        z_bed_mean,
+    )
 end
 
 """
@@ -62,7 +72,18 @@ $(TYPEDSIGNATURES)
 
 Same as [`correct`](@ref), but modifies `ghf` in-place.
 """
-function correct!(ghf::AbstractMatrix, z_bed, z_bed_mean, correction::AbstractGHFCorrection)
-    map!((g, z, z_mean) -> _correct(g, z, z_mean, correction), ghf, ghf, z_bed, z_bed_mean)
+function correct!(
+    ghf::AbstractMatrix,
+    z_bed,
+    z_bed_mean,
+    correction::AbstractGHFCorrection,
+)
+    map!(
+        (g, z, z_mean) -> _correct(g, z, z_mean, correction),
+        ghf,
+        ghf,
+        z_bed,
+        z_bed_mean,
+    )
     return nothing
 end

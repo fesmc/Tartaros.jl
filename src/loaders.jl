@@ -52,8 +52,8 @@ function load_ghf(
     T2 = Float32,
 )
     NCDatasets.Dataset(filepath, "r") do ds
-        x   = T2.(ds[x_name][:])
-        y   = T2.(ds[y_name][:])
+        x = T2.(ds[x_name][:])
+        y = T2.(ds[y_name][:])
         ghf = T1.(ds[ghf_name][:, :])
         return GHFDataset(x, y, ghf, units, source)
     end
@@ -85,6 +85,6 @@ function interpolate_ghf(
         y, ghf = y[p], ghf[:, p]
     end
 
-    itp = linear_interpolation((x, y), ghf, extrapolation_bc=NaN)
+    itp = linear_interpolation((x, y), ghf, extrapolation_bc = NaN)
     return itp.(x_target, y_target)
 end
