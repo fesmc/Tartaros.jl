@@ -139,6 +139,8 @@ using Statistics: mean
         model = FiniteColumnGHF(ghf_ref_f, dT_f; k = k_f, kappa = kappa_f, H_litho = H_f)
         @test model.t_elapsed[1] == 0.0
         @test model.N == 200
+        @test length(model.lambda2) == 200
+        @test model.lambda2 ≈ [((n + 0.5) * pi / H_f)^2 for n in 0:199]
 
         # One-step: output equals closed-form sum
         ghf = zeros(nx, ny)
@@ -164,6 +166,45 @@ using Statistics: mean
         model_long = FiniteColumnGHF(ghf_ref_f, dT_f; k = k_f, kappa = kappa_f, H_litho = H_f)
         ghf!(ghf, zeros(nx, ny), model_long, 1e20)
         @test ghf ≈ ghf_ref_f  atol = 1e-10
+    end
+
+    # The stateful models advance a clock held in a 1-element array. Under an array
+    # compiler a clock that fails to advance produces plausible but wrong output with no
+    # error at all, so assert explicitly that state moves and that dt is honoured.
+    @testset "stateful clocks" begin
+        nx, ny = 2, 2
+        k_c, kappa_c, H_c = 3.0, 1e-6, 2_000.0
+        ghf_ref_c = fill(0.060, nx, ny)
+        dT_c      = fill(15.0,  nx, ny)
+        dt        = 1e10
+
+        for model in (InfiniteColumnGHF(ghf_ref_c, dT_c; k = k_c, kappa = kappa_c,
+                                        H_litho = H_c),
+                      FiniteColumnGHF(ghf_ref_c, dT_c; k = k_c, kappa = kappa_c,
+                                      H_litho = H_c))
+            ghf1, ghf2 = zeros(nx, ny), zeros(nx, ny)
+            ghf!(ghf1, zeros(nx, ny), model, dt)
+            ghf!(ghf2, zeros(nx, ny), model, dt)
+            @test model.t_elapsed[1] ≈ 2dt          # clock advanced twice
+            @test !(ghf1 ≈ ghf2)                    # output actually changed
+
+            # A different dt must give a different answer
+            m_big = typeof(model) <: InfiniteColumnGHF ?
+                InfiniteColumnGHF(ghf_ref_c, dT_c; k = k_c, kappa = kappa_c, H_litho = H_c) :
+                FiniteColumnGHF(ghf_ref_c, dT_c; k = k_c, kappa = kappa_c, H_litho = H_c)
+            ghf3 = zeros(nx, ny)
+            ghf!(ghf3, zeros(nx, ny), m_big, 10dt)
+            @test m_big.t_elapsed[1] ≈ 10dt
+            @test !(ghf3 ≈ ghf1)
+        end
+
+        # dt must match the model's float type, so that a Float64 dt cannot silently
+        # promote a Float32 model.
+        m32 = InfiniteColumnGHF(Float32.(ghf_ref_c), Float32.(dT_c);
+                                k = 3.0f0, kappa = 1.0f-6, H_litho = 2.0f3)
+        @test_throws MethodError ghf!(zeros(Float32, nx, ny), zeros(Float32, nx, ny),
+                                      m32, 1.0e10)
+        @test ghf!(zeros(Float32, nx, ny), zeros(Float32, nx, ny), m32, 1.0f10) === nothing
     end
 
     @testset "DiffusionGHF" begin
