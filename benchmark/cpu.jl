@@ -33,3 +33,13 @@ cpu["InfiniteColumnGHF"]       = @benchmarkable ghf!($ghf_out, $T_warm, $model_i
 cpu["FiniteColumnGHF"]         = @benchmarkable ghf!($ghf_out, $T_warm, $model_finite, $dt_b)
 cpu["DiffusionGHF"]            = @benchmarkable ghf!($ghf_out, $T_warm, $model_dif,    $dt_b)
 cpu["TridiagonalDiffusionGHF"] = @benchmarkable ghf!($ghf_out, $T_warm, $model_tri,    $dt_b)
+
+# Smoothing, for comparison with the Reactant suite. The Gaussian is separable and takes
+# the two-pass path; the top-hat is not and runs the full 2D stencil.
+const z_bed_c = 1_000.0 .* rand(nx, ny)
+const dx_c    = 1_000.0
+
+cpu["smooth, ConstantSmoothingKernel"] =
+    @benchmarkable smooth($z_bed_c, $dx_c, $(ConstantSmoothingKernel(r = 3_000.0)))
+cpu["smooth, GaussianSmoothingKernel"] =
+    @benchmarkable smooth($z_bed_c, $dx_c, $(GaussianSmoothingKernel(r = 2_000.0)))
