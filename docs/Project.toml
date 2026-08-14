@@ -6,6 +6,7 @@ DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
 LazyGrids = "7031d0ef-c40d-4431-b2f8-61a8d2f650db"
 Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 NCDatasets = "85f8d34a-cbdd-5861-8df4-14fed0d494ab"
+Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
 Tartaros = "04f78ae1-ffe2-4bb2-8f90-a172d7da432b"
 
 [compat]
@@ -13,3 +14,4 @@ CairoMakie = "0.15.10"
 Documenter = "1.17.0"
 Literate = "2.21.0"
 NCDatasets = "0.14.15"
+Reactant = "0.2.278"
