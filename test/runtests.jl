@@ -2,6 +2,8 @@ using Tartaros
 using Test
 using Statistics: mean
 
+include("reference_diffusion.jl")
+
 @testset "Tartaros.jl" begin
 
     @testset "filters" begin
@@ -246,7 +248,9 @@ using Statistics: mean
         @test omega_rec2 ≈ omega_test
     end
 
-    @testset "TridiagonalDiffusionGHF" begin
+    # The KernelAbstractions kernel is checked against an independent serial solve built
+    # on LinearAlgebra.Tridiagonal, kept in the test suite rather than the package.
+    @testset "DiffusionGHF vs serial reference" begin
         nx, ny   = 3, 4
         k_d      = 3.0
         kappa_d  = 1e-6
@@ -254,25 +258,25 @@ using Statistics: mean
         ghf_deep = fill(0.060, nx, ny)
         T_ice    = fill(270.0,  nx, ny)
 
-        model = TridiagonalDiffusionGHF(ghf_deep, T_ice; k = k_d, kappa = kappa_d, H_litho = H_d)
+        model = ReferenceDiffusionGHF(ghf_deep, T_ice; k = k_d, kappa = kappa_d, H_litho = H_d)
 
         @test model.T_col[:, :, end] ≈ T_ice
         @test model.T_col[:, :, 1]   ≈ T_ice .+ ghf_deep .* H_d ./ k_d
 
         # Steady-state preservation: surface GHF should recover ghf_deep after one step
         ghf = zeros(nx, ny)
-        ghf!(ghf, T_ice, model, 3.15e7)
+        reference_ghf!(ghf, T_ice, model, 3.15e7)
         @test ghf ≈ ghf_deep  atol = 1e-6
 
         # Results match DiffusionGHF for a warming step
         T_warm   = fill(273.0, nx, ny)
         model_ka = DiffusionGHF(ghf_deep, T_ice; k = k_d, kappa = kappa_d, H_litho = H_d)
-        model_tr = TridiagonalDiffusionGHF(ghf_deep, T_ice; k = k_d, kappa = kappa_d, H_litho = H_d)
+        model_tr = ReferenceDiffusionGHF(ghf_deep, T_ice; k = k_d, kappa = kappa_d, H_litho = H_d)
         ghf_ka   = zeros(nx, ny)
         ghf_tr   = zeros(nx, ny)
         for _ in 1:20
             ghf!(ghf_ka, T_warm, model_ka, 3.15e7)
-            ghf!(ghf_tr, T_warm, model_tr, 3.15e7)
+            reference_ghf!(ghf_tr, T_warm, model_tr, 3.15e7)
         end
         @test ghf_ka ≈ ghf_tr  atol = 1e-10
     end

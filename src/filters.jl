@@ -1,28 +1,36 @@
 # TODO: this could be part of KryosTools.jl
 
 """
-    AbstractSmoothingKernel
+$(TYPEDEF)
 
 Abstract type for spatial smoothing kernels. See [`ConstantSmoothingKernel`](@ref) and [`GaussianSmoothingKernel`](@ref).
 """
 abstract type AbstractSmoothingKernel end
 
 """
-    ConstantSmoothingKernel(; r = 5_000.0)
+$(TYPEDEF)
 
-Uniform (top-hat) smoothing kernel that averages all grid cells within radius `r` (metres).
+Uniform (top-hat) smoothing kernel that averages all grid cells within radius `r`.
+
+# Fields
+$(TYPEDFIELDS)
 """
 @kwdef struct ConstantSmoothingKernel{T} <: AbstractSmoothingKernel
-    r::T = 5_000.0   # disk radius in meters
+    "disk radius [m]"
+    r::T = 5_000.0
 end
 
 """
-    GaussianSmoothingKernel(; r = 5_000.0)
+$(TYPEDEF)
 
-Gaussian smoothing kernel with standard deviation `r` (metres), truncated at 3σ.
+Gaussian smoothing kernel with standard deviation `r`, truncated at 3σ.
+
+# Fields
+$(TYPEDFIELDS)
 """
 @kwdef struct GaussianSmoothingKernel{T} <: AbstractSmoothingKernel
-    r::T = 5_000.0   # standard deviation in meters
+    "standard deviation [m]"
+    r::T = 5_000.0
 end
 
 """
@@ -61,18 +69,13 @@ function _build_kernel(dx::Real, dy::Real, kernel::ConstantSmoothingKernel)
     return K ./ sum(K)
 end
 
+# A Gaussian is the outer product of its 1D factors, so the 2D kernel is built from them
+# rather than duplicating the truncation and normalisation.
 function _build_kernel(dx::Real, dy::Real, kernel::GaussianSmoothingKernel)
-    r = kernel.r
-    nx = 2 * ceil(Int, 3r / dx) + 1   # truncate at 3σ
-    ny = 2 * ceil(Int, 3r / dy) + 1
-    cx, cy = (nx + 1) ÷ 2, (ny + 1) ÷ 2
-    K = [
-        exp(-0.5 * (((i - cx) * dx)^2 + ((j - cy) * dy)^2) / r^2) for i = 1:nx, j = 1:ny
-    ]
-    return K ./ sum(K)
+    kx, ky = _build_kernel_factors(dx, dy, kernel)
+    return kx * ky'
 end
 
-# 1D factors of the separable Gaussian: _build_kernel(dx, dy, k) == kx * ky'
 function _build_kernel_factors(dx::Real, dy::Real, kernel::GaussianSmoothingKernel)
     return _gaussian_factor(dx, kernel.r), _gaussian_factor(dy, kernel.r)
 end

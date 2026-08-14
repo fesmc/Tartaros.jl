@@ -1,24 +1,25 @@
 """
-    GHFDataset{Tx, Ty, Tg}
+$(TYPEDEF)
 
 A geothermal heat flux dataset on a regular grid.
 
 # Fields
-- `x`: first-axis coordinates (e.g. longitude or projected easting), length `nx`
-- `y`: second-axis coordinates (e.g. latitude or projected northing), length `ny`
-- `ghf`: GHF values of size `(nx, ny)`, in `units`
-- `units`: physical unit string (default `"mW m⁻²"`)
-- `source`: dataset name or citation
+$(TYPEDFIELDS)
 """
 struct GHFDataset{
     Tx,     # <:AbstractVector,
     Ty,     # <:AbstractVector,
     Tg,     # <:AbstractMatrix
 }
+    "first-axis coordinates (e.g. longitude or projected easting), length `nx`"
     x::Tx
+    "second-axis coordinates (e.g. latitude or projected northing), length `ny`"
     y::Ty
+    "GHF values of size `(nx, ny)`, in `units`"
     ghf::Tg
+    "physical unit string (default `\"mW m⁻²\"`)"
     units::String
+    "dataset name or citation"
     source::String
 end
 

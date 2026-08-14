@@ -6,6 +6,71 @@ basal ice temperature through the thermal inertia of the lithosphere. Tartaros.j
 provides several models that capture different levels of this physics, all as subtypes
 of [`AbstractGHF`](@ref) advanced via [`ghf!`](@ref).
 
+## Model equations
+
+``G`` denotes the surface GHF, ``G_\text{ref}`` the reference (deep-mantle) flux, ``k`` the
+thermal conductivity, ``\kappa`` the thermal diffusivity, ``H`` the lithosphere thickness
+and ``\Delta T`` a step change in ice-base temperature imposed at ``t = 0``.
+
+[`PrescribedGHF`](@ref) holds the flux fixed, with no feedback from the ice base:
+
+```math
+G(t) = G_\text{ref}
+```
+
+[`SteadyStateGHF`](@ref) applies Fourier's law to a linear profile, responding instantly:
+
+```math
+G = k \, \frac{T_\text{mantle} - T_\text{ice}}{H_\text{litho}}
+```
+
+[`ThermalRelaxationGHF`](@ref) lags that response exponentially (Huybrechts/Ritz):
+
+```math
+\frac{\mathrm{d}G}{\mathrm{d}t} = \frac{G_\text{ref} - G}{\tau}
+```
+
+[`InfiniteColumnGHF`](@ref) is the semi-infinite analytical solution, valid while
+``\sqrt{\kappa t} \ll H``:
+
+```math
+G(t) = G_\text{ref} - \frac{k \, \Delta T}{\sqrt{\pi \kappa t}}
+```
+
+[`FiniteColumnGHF`](@ref) is the eigenfunction expansion for a column of finite thickness,
+which relaxes exponentially rather than as ``1/\sqrt{t}``:
+
+```math
+G(t) = G_\text{ref} - \frac{2 k \, \Delta T}{H} \sum_{n=0}^{N-1}
+       \exp\!\left(-\lambda_n^2 \kappa t\right),
+       \qquad \lambda_n = \frac{(2n+1)\pi}{2H}
+```
+
+[`DiffusionGHF`](@ref) integrates the 1-D heat equation through the column numerically,
+optionally with radiogenic heat production ``H_\text{prod}``:
+
+```math
+\frac{\partial T}{\partial t} =
+    \kappa \frac{\partial^2 T}{\partial z^2} + \frac{\kappa H_\text{prod}}{k}
+```
+
+with a Neumann condition (prescribed flux ``G_\text{ref}``) at the base and a Dirichlet
+condition (prescribed ``T_\text{ice}``) at the top. Its column is initialised to the
+analytical steady state of that equation, in sigma coordinates ``\zeta \in [0, 1]``:
+
+```math
+T(\zeta) = T_\text{ice} + \frac{G_\text{ref} H (1 - \zeta)}{k} +
+           \frac{H_\text{prod} H^2 (1 - \zeta^2)}{2k}
+```
+
+Independently of the model, [`TopographicGHFCorrection`](@ref) rescales the result by the
+departure of the local bed elevation ``z_b`` from its spatial mean ``\bar{z}_b``, with a
+characteristic height ``\alpha`` setting the strength:
+
+```math
+G_\text{corrected} = G \left( 1 + \frac{\bar{z}_b - z_b}{\alpha} \right)
+```
+
 ## Scenario
 
 We simulate a **step-warming event**: the ice base is initially cold (258 K) and warms

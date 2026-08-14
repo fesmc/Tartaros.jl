@@ -114,11 +114,11 @@ cost of roughly 25–60 s per compiled function.
 
 ### Lithosphere diffusion, 300×300×10
 
-| Implementation                                   | CPU       | GPU     |
-|:-------------------------------------------------|----------:|--------:|
-| `TridiagonalDiffusionGHF` (serial reference)      | 57.6 ms   | —       |
-| `DiffusionGHF`, KernelAbstractions kernel         | 13.3 ms   | 0.26 ms |
-| `DiffusionGHF` under Reactant (slab formulation)  |  4.2 ms   | 0.36 ms |
+| Implementation                                    | CPU       | GPU     |
+|:--------------------------------------------------|----------:|--------:|
+| Serial reference solve (kept in the test suite)    | 57.6 ms   | —       |
+| `DiffusionGHF`, KernelAbstractions kernel          | 13.3 ms   | 0.26 ms |
+| `DiffusionGHF` under Reactant (slab formulation)   |  4.2 ms   | 0.36 ms |
 
 On the CPU the compiled slab formulation is 3× ahead of the kernel. On the GPU the
 KernelAbstractions kernel is *faster* for an isolated call — one hand-written kernel beats

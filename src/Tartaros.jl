@@ -1,9 +1,8 @@
 module Tartaros
 
-using DocStringExtensions: TYPEDSIGNATURES
+using DocStringExtensions: TYPEDEF, TYPEDFIELDS, TYPEDSIGNATURES
 using Interpolations
 using KernelAbstractions
-using LinearAlgebra
 using NCDatasets: NCDatasets
 
 include("filters.jl")
@@ -21,7 +20,6 @@ export GHFDataset, load_ghf, interpolate_ghf
 
 export AbstractGHF, PrescribedGHF, SteadyStateGHF
 export ThermalRelaxationGHF, InfiniteColumnGHF, FiniteColumnGHF, DiffusionGHF
-export TridiagonalDiffusionGHF
 export ghf!
 export to_enthalpy, from_enthalpy
 

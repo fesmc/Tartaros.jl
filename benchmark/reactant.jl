@@ -7,9 +7,6 @@
 #
 # The backend is pinned to "cpu" so the suite is reproducible on machines with and without
 # a GPU; set "gpu" to measure the same code on an accelerator.
-#
-# TridiagonalDiffusionGHF is absent by design: it is a serial reference implementation
-# built on scalar indexing and cannot be traced.
 
 using Reactant
 

@@ -1,5 +1,5 @@
 """
-$(TYPEDSIGNATURES)
+$(TYPEDEF)
 
 An abstract type for the thermodynamics of the lithosphere.
 
@@ -14,38 +14,38 @@ An abstract type for the thermodynamics of the lithosphere.
 abstract type AbstractGHF end
 
 """
-$(TYPEDSIGNATURES)
+$(TYPEDEF)
 
 GHF is held constant at `ghf_ref` and excludes any feedbacks from changes in basal ice temperature.
 
 # Fields
- - `ghf_ref`: reference GHF field [mW m⁻²]
+$(TYPEDFIELDS)
 """
 struct PrescribedGHF{M} <: AbstractGHF
+    "reference GHF field [mW m⁻²]"
     ghf_ref::M
 end
 
 """
-$(TYPEDSIGNATURES)
+$(TYPEDEF)
 
 GHF is recomputed at every time step from Fourier's law applied to a linear
 (steady-state) temperature profile through the lithosphere:
 
-```math
-\\begin{aligned}
-    G = k \\cdot \\dfrac{T_\\mathrm{mantle} - T_\\mathrm{ice}}{H_\\mathrm{litho}}
-\\end{aligned}
+```text
+G = k ⋅ (T_mantle - T_ice) / H_litho
 ```
 
 # Fields
- - `k`: thermal conductivity [W m⁻¹ K⁻¹]
- - `H_litho`: lithosphere thickness [m]
- - `T_mantle`: temperature at the base of the lithosphere [K]
+$(TYPEDFIELDS)
 """
 @kwdef struct SteadyStateGHF{T,M} <: AbstractGHF
+    "thermal conductivity [W m⁻¹ K⁻¹]"
     k::T
+    "lithosphere thickness [m]"
     H_litho::T
-    T_mantle::M  # scalar or spatial field [K]
+    "temperature at the base of the lithosphere, scalar or spatial field [K]"
+    T_mantle::M
 end
 
 function SteadyStateGHF(ghf_ref, T_ice_base; k, H_litho)
@@ -57,29 +57,29 @@ function SteadyStateGHF(ghf_ref, T_ice_base; k, H_litho)
 end
 
 """
-$(TYPEDSIGNATURES)
+$(TYPEDEF)
 
 GHF relaxes exponentially toward the steady-state target `ghf_ref`
 with timescale `tau` (Huybrechts/Ritz lag model):
 
-```math
-\\begin{aligned}
-    \\dfrac{dG}{dt} = \\dfrac{G_\\mathrm{ref} - G}{\\tau}
-\\end{aligned}
+```text
+dG/dt = (G_ref - G) / τ
 ```
 
-As shown in the example section, this model gives a relatively inaccurate transient behaviour and we therefore recommend using other models, unless the user wants to perform comparison (e.g. with legacy code).
+This model has a relatively inaccurate transient behaviour (see the examples), so prefer
+another one unless comparing against legacy code.
 
 # Fields
- - `ghf_ref`: asymptotic GHF target [W m⁻²]
- - `ghf_state`: current GHF state (updated in-place by `ghf!`) [W m⁻²]
- - `tau`: thermal relaxation timescale [s]
+$(TYPEDFIELDS)
 """
 @kwdef struct ThermalRelaxationGHF{M,T} <: AbstractGHF
+    "asymptotic GHF target [W m⁻²]"
     ghf_ref::M
+    "current GHF state, updated in-place by [`ghf!`](@ref) [W m⁻²]"
     ghf_state::M
-    tau::T
     # TODO: this could be tau(x,y), derived from H_litho(x,y) and kappa
+    "thermal relaxation timescale [s]"
+    tau::T
 end
 
 ThermalRelaxationGHF(ghf_ref; tau) =
@@ -89,29 +89,22 @@ ThermalRelaxationGHF(ghf_ref, ghf_init; tau) =
     ThermalRelaxationGHF(ghf_ref = ghf_ref, ghf_state = copy(ghf_init), tau = tau)
 
 """
-$(TYPEDSIGNATURES)
+$(TYPEDEF)
 
 GHF is computed from the semi-infinite analytical solution to the 1D heat diffusion
 equation following Fourier / Carslaw & Jaeger. After a step change `delta_T` in the
 ice-base temperature at t = 0, the surface GHF evolves as:
 
-```math
-G(t) = G_\\text{ref} - \\frac{k\\,\\Delta T}{\\sqrt{\\pi\\kappa\\,t}}
+```text
+G(t) = G_ref - k ΔT / √(π κ t)
 ```
 
-This solution is exact for a semi-infinite medium (i.e. the thermal perturbation has
-not yet reached the bottom of the column). It is valid while `sqrt(kappa * t) << H_litho`.
-At long times the formula returns `G → G_ref`; use `DiffusionGHF` when the finite-column
-correction matters.
+Exact while the perturbation has not reached the bottom of the column, i.e. while
+`sqrt(kappa * t) << H_litho`. Use [`FiniteColumnGHF`](@ref) or [`DiffusionGHF`](@ref) when
+the finite-column correction matters.
 
 # Fields
- - `ghf_ref`: initial equilibrium GHF [W m⁻²]
- - `delta_T`: ice-base temperature step at t = 0, i.e. T_new − T_old [K]
- - `k`: thermal conductivity [W m⁻¹ K⁻¹]
- - `kappa`: thermal diffusivity [m² s⁻¹]
- - `H_litho`: column thickness — semi-∞ approx. valid when `sqrt(kappa * t) << H_litho` [m]
- - `t_elapsed`: total time since the temperature step, held in a 1-element array so that it
-   lives on the same device as `ghf_ref` and can be advanced by broadcast [s]
+$(TYPEDFIELDS)
 
 # Convenience constructor
 
@@ -120,12 +113,18 @@ correction matters.
 Construct an `InfiniteColumnGHF` with the clock reset to t = 0 (the moment of the temperature step).
 """
 struct InfiniteColumnGHF{M,T,V} <: AbstractGHF
+    "initial equilibrium GHF [W m⁻²]"
     ghf_ref::M
+    "ice-base temperature step at t = 0, i.e. `T_new - T_old` [K]"
     delta_T::M
+    "thermal conductivity [W m⁻¹ K⁻¹]"
     k::T
+    "thermal diffusivity [m² s⁻¹]"
     kappa::T
+    "column thickness — semi-∞ approx. valid when `sqrt(kappa * t) << H_litho` [m]"
     H_litho::T
-    t_elapsed::V   # [1]-element array for in-place update within an immutable struct
+    "time since the temperature step, as a 1-element array (see [`_zero_clock`](@ref)) [s]"
+    t_elapsed::V
 end
 
 function InfiniteColumnGHF(ghf_ref, delta_T; k, kappa, H_litho)
@@ -137,13 +136,11 @@ $(TYPEDSIGNATURES)
 
 Allocate the 1-element array holding the elapsed time of a stateful GHF model.
 
-The clock is allocated with `similar(ghf_ref, ...)` so that it resides on the same device
-as the model fields. This matters for two reasons: on a GPU it avoids a host round-trip
-at every step, and under an array compiler such as Reactant a clock held in an ordinary
-host `Vector` is constant-folded into the compiled program, so it would silently never
-advance. For the same reason the clock must only ever be updated by broadcast
-(`t_elapsed .+= dt`) and read by broadcast — `t_elapsed[1]` is scalar indexing and is
-rejected on traced arrays.
+`similar(ghf_ref, ...)` keeps the clock on the same device as the model fields: on a GPU
+this avoids a host round-trip per step, and under an array compiler such as Reactant a
+clock held in a host `Vector` is constant-folded and would silently never advance. For the
+same reason it must only be updated and read by broadcast — `t_elapsed[1]` is scalar
+indexing, which traced arrays reject.
 """
 function _zero_clock(ghf_ref::AbstractArray)
     t = similar(ghf_ref, eltype(ghf_ref), 1)
@@ -152,45 +149,44 @@ function _zero_clock(ghf_ref::AbstractArray)
 end
 
 """
-$(TYPEDSIGNATURES)
+$(TYPEDEF)
 
 GHF is computed from the eigenfunction expansion (Fourier cosine series) of the 1D heat
 diffusion equation in a finite lithosphere slab of thickness `H_litho`. After a step change
 `delta_T` in the ice-base temperature at t = 0, the surface GHF evolves as:
 
-```math
-G(t) = G_\\text{ref} - \\frac{2 k \\Delta T}{H} \\sum_{n=0}^{N-1}
-    \\exp\\!\\left(-\\lambda_n^2 \\kappa\\, t\\right), \\qquad
-    \\lambda_n = \\frac{(2n+1)\\pi}{2H}
+```text
+G(t) = G_ref - (2 k ΔT / H) ⋅ ∑ₙ exp(-λₙ² κ t)     for n = 0 … N-1
+λₙ   = (2n + 1) π / (2H)
 ```
 
-This results from simplifications of the analytical solution for the thermodynamics of a finite column derived by [moreno-parada_analytical_2024](@ref). The boundary conditions are Dirichlet at the ice base and Neumann (fixed mantle flux) at the
-base of the column, so `G(t) → G_ref` as `t → ∞`. At early times the series reduces to the
-semi-infinite approximation used by [`InfiniteColumnGHF`](@ref), but the eigenfunction expansion
-converges exponentially once `t ≳ H²/(π² κ)` instead of the algebraic 1/√t tail.
+Simplified from the finite-column solution of [moreno-parada_analytical_2024](@ref), with
+Dirichlet at the ice base and Neumann (fixed mantle flux) below, so `G(t) → G_ref`. At early
+times it matches [`InfiniteColumnGHF`](@ref), but relaxes exponentially once
+`t ≳ H²/(π² κ)` rather than as `1/√t`.
 
-`N` terms are sufficient when `exp(-((N-1/2)π/H)²κt) ≪ 1`; the default `N = 200` is accurate
-for time steps as short as a few years with typical lithosphere parameters.
+`N` terms suffice when `exp(-((N-1/2)π/H)²κt) ≪ 1`; the default is accurate down to
+time steps of a few years for typical lithosphere parameters.
 
 # Fields
- - `ghf_ref`: initial equilibrium GHF [W m⁻²]
- - `delta_T`: ice-base temperature step at t = 0, i.e. T_new − T_old [K]
- - `k`: thermal conductivity [W m⁻¹ K⁻¹]
- - `kappa`: thermal diffusivity [m² s⁻¹]
- - `H_litho`: lithosphere column thickness [m]
- - `N`: number of eigenfunction terms (default 200)
- - `t_elapsed`: total time since the temperature step, held in a 1-element array (see
-   [`_zero_clock`](@ref)) [s]
- - `lambda2`: precomputed eigenvalues `λₙ² = ((2n+1)π / 2H)²`, `N`-vector [m⁻²]
+$(TYPEDFIELDS)
 """
 struct FiniteColumnGHF{M,T,V,L} <: AbstractGHF
+    "initial equilibrium GHF [W m⁻²]"
     ghf_ref::M
+    "ice-base temperature step at t = 0, i.e. `T_new - T_old` [K]"
     delta_T::M
+    "thermal conductivity [W m⁻¹ K⁻¹]"
     k::T
+    "thermal diffusivity [m² s⁻¹]"
     kappa::T
+    "lithosphere column thickness [m]"
     H_litho::T
+    "number of eigenfunction terms (default 200)"
     N::Int
+    "time since the temperature step, as a 1-element array (see [`_zero_clock`](@ref)) [s]"
     t_elapsed::V
+    "precomputed eigenvalues `λₙ² = ((2n+1)π / 2H)²`, `N`-vector [m⁻²]"
     lambda2::L
 end
 
@@ -216,20 +212,14 @@ function FiniteColumnGHF(ghf_ref, delta_T; k, kappa, H_litho, N::Int = 200)
 end
 
 """
-$(TYPEDSIGNATURES)
+$(TYPEDEF)
 
 GHF is computed by numerically integrating the 1D heat diffusion equation through the
-lithosphere column. `ghf_ref` serves as the prescribed deep-mantle heat flux (bottom
-boundary condition). Optionally includes radiogenic heat production `H_prod`.
+lithosphere column, with `ghf_ref` as the prescribed deep-mantle flux at the base and
+optional radiogenic heat production `H_prod`.
 
 # Fields
- - `ghf_ref`: deep mantle heat flux, bottom BC [W m⁻²]
- - `k`: thermal conductivity [W m⁻¹ K⁻¹]
- - `kappa`: thermal diffusivity k/(ρcₚ) [m² s⁻¹]
- - `H_litho`: lithosphere column thickness [m]
- - `H_prod`: volumetric radiogenic heat production [W m⁻³]
- - `zeta`: sigma coordinates ∈ [0, 1], nz-vector; ζ=0 base, ζ=1 surface
- - `T_col`: temperature state [K], size (nx, ny, nz)
+$(TYPEDFIELDS)
 
 # Convenience constructor
 
@@ -244,15 +234,24 @@ steady-state profile consistent with `ghf_ref` and `T_ice_base`.
     Z,      # <:AbstractVector
     C,      # <:AbstractArray{<:AbstractFloat, 3}
 } <: AbstractGHF
+    "deep mantle heat flux, bottom BC [W m⁻²]"
     ghf_ref::M
+    "thermal conductivity [W m⁻¹ K⁻¹]"
     k::T
+    "thermal diffusivity k/(ρcₚ) [m² s⁻¹]"
     kappa::T
+    "lithosphere column thickness [m]"
     H_litho::T
+    "volumetric radiogenic heat production [W m⁻³]"
     H_prod::T
+    "sigma coordinates ∈ [0, 1], nz-vector; ζ=0 base, ζ=1 surface"
     zeta::Z
+    "temperature state [K], size (nx, ny, nz)"
     T_col::C
-    d_buf::C  # Thomas-algorithm scratch: modified main diagonal
-    b_buf::C  # Thomas-algorithm scratch: modified RHS
+    "Thomas-algorithm scratch: modified main diagonal"
+    d_buf::C
+    "Thomas-algorithm scratch: modified RHS"
+    b_buf::C
 end
 
 function DiffusionGHF(ghf_ref, T_ice_base; k, kappa, H_litho, H_prod = 0.0, nz = 5)
@@ -266,107 +265,22 @@ function DiffusionGHF(ghf_ref, T_ice_base; k, kappa, H_litho, H_prod = 0.0, nz =
 end
 
 """
-($TYPEDSIGNATURES)
-
-GHF is computed by numerically integrating the 1D heat diffusion equation through the
-lithosphere column using `LinearAlgebra.Tridiagonal` on a serial CPU loop.
-Identical physics to [`DiffusionGHF`](@ref); use this when the KernelAbstractions
-parallel dispatch is not needed or as a reference implementation.
-
-!!! warning "TridiagonalDiffusionGHF deprecated"
-
-    `TridiagonalDiffusionGHF` should only be used for comparison and testing purposes, since `DiffusionGHF` gives the same results with much better performance.
-
-
-# Fields
- - `ghf_ref`: deep mantle heat flux, bottom BC [W m⁻²]
- - `k`: thermal conductivity [W m⁻¹ K⁻¹]
- - `kappa`: thermal diffusivity k/(ρcₚ) [m² s⁻¹]
- - `H_litho`: lithosphere column thickness [m]
- - `H_prod`: volumetric radiogenic heat production [W m⁻³]
- - `zeta`: sigma coordinates ∈ [0, 1], nz-vector; ζ=0 base, ζ=1 surface
- - `T_col`: temperature state [K], size (nx, ny, nz)
-
-# Convenience constructor
-
-    TridiagonalDiffusionGHF(ghf_ref, T_ice_base; k, kappa, H_litho, H_prod = 0.0, nz = 5)
-"""
-@kwdef struct TridiagonalDiffusionGHF{M,T,Z,C} <: AbstractGHF
-    ghf_ref::M
-    k::T
-    kappa::T
-    H_litho::T
-    H_prod::T
-    zeta::Z
-    T_col::C
-end
-
-function TridiagonalDiffusionGHF(
-    ghf_ref,
-    T_ice_base;
-    k,
-    kappa,
-    H_litho,
-    H_prod = 0.0,
-    nz = 5,
-)
-    zeta = collect(LinRange(0.0, 1.0, nz))
-    T_col = _steady_T_col(ghf_ref, T_ice_base, k, H_litho, H_prod, zeta)
-    return TridiagonalDiffusionGHF(; ghf_ref, k, kappa, H_litho, H_prod, zeta, T_col)
-end
-
-"""
 $(TYPEDSIGNATURES)
 
 Analytical steady-state solution of the Poisson equation with heat production:
 
-```math
-    T(\\zeta) = T_\\mathrm{ice} + \\frac{ghf_\\mathrm{ref} \\cdot H \\cdot (1 - \\zeta)}{k} +
-                \\frac{H_\\mathrm{prod} \\cdot H^2 \\cdot (1 - \\zeta^2)}{2k}
+```text
+T(ζ) = T_ice + ghf_ref ⋅ H (1 - ζ) / k + H_prod ⋅ H² (1 - ζ²) / (2k)
 ```
+
+`ghf_ref` may be a field or a scalar; `ndims` of a scalar is 0, so the reshape leaves
+`zeta` untouched in that case.
 """
-function _steady_T_col(ghf_ref::AbstractArray, T_ice_base, k, H_litho, H_prod, zeta)
+function _steady_T_col(ghf_ref, T_ice_base, k, H_litho, H_prod, zeta)
     ζ = reshape(zeta, ntuple(_ -> 1, ndims(ghf_ref))..., :)
     return @. T_ice_base +
               ghf_ref * H_litho * (1 - ζ) / k +
               H_prod * H_litho^2 * (1 - ζ^2) / (2k)
-end
-
-function _steady_T_col(ghf_ref::Number, T_ice_base, k, H_litho, H_prod, zeta)
-    return @. T_ice_base +
-              ghf_ref * H_litho * (1 - zeta) / k +
-              H_prod * H_litho^2 * (1 - zeta^2) / (2k)
-end
-
-# Advance a single temperature column by dt (implicit Euler, serial CPU).
-# Bottom BC: Neumann — prescribed heat flux Q_deep (ghost-node method).
-# Top BC: Dirichlet — prescribed temperature T_ice.
-# THIS FUNCTION IS NOT PERFORMANT AND IS ONLY USED FOR TESTING AND COMPARISON WITH THE KERNELABSTRACTIONS IMPLEMENTATION.
-function _solve_column!(col, Q_deep, T_ice, k, kappa, H_litho, H_prod, dt)
-    nz = length(col)
-    dz = H_litho / (nz - 1)
-    r = kappa * dt / dz^2
-    S = H_prod * kappa * dt / k
-
-    n = nz - 1
-    dl = fill(-r, n - 1)
-    d = fill(1 + 2r, n)
-    du = fill(-r, n - 1)
-    rhs = col[1:n] .+ S
-
-    du[1] = -2r
-    rhs[1] += 2r * dz * Q_deep / k
-    rhs[n] += r * T_ice
-
-    col[1:n] .= LinearAlgebra.Tridiagonal(dl, d, du) \ rhs
-    col[nz] = T_ice
-    return nothing
-end
-
-function _surface_ghf(col, k, H_litho)
-    nz = length(col)
-    dz = H_litho / (nz - 1)
-    return -k * (col[nz] - col[nz-1]) / dz
 end
 
 @inline _getval(x::AbstractArray, i, j) = x[i, j]
@@ -399,16 +313,9 @@ end
     Tbc = T_ice_base[i, j]
 
     # ── Forward sweep ─────────────────────────────────────────────────────────
-    # d_buf[i,j,p]: modified main diagonal d'[p]
-    # b_buf[i,j,p]: modified RHS           b'[p]
-    #
-    # System coefficients (row p):
-    #   sub-diag a[p]  = -r           (p = 2..n)
-    #   main-diag d[p] = 1+2r
-    #   super-diag c[p]= -2r (p=1), -r (p=2..n-1); no entry at p=n
-    #   rhs b[1] = T_col[1]+S+2r·dz·Q/k  (Neumann ghost-node)
-    #   rhs b[p] = T_col[p]+S            (interior, 2≤p<n)
-    #   rhs b[n] = T_col[n]+S+r·T_ice   (Dirichlet shift)
+    # d_buf holds the modified main diagonal d'[p], b_buf the modified RHS b'[p]. The
+    # system is a[p] = -r, d[p] = 1+2r, c[p] = -2r at p=1 and -r elsewhere; the ghost-node
+    # and Dirichlet terms enter the RHS at p = 1 and p = n respectively.
     d_buf[i, j, 1] = one(k) + 2r
     b_buf[i, j, 1] = T_col[i, j, 1] + S + 2r * dz * Q / k
     for p = 2:n
@@ -432,21 +339,14 @@ end
 end
 
 # ── Array-compiler friendly diffusion ─────────────────────────────────────────
-# `_diffusion_kernel!` above solves one column per thread, sweeping over z inside the
-# kernel. Array compilers such as Reactant cannot trace that (it indexes elements), so the
-# variant below runs the identical Thomas algorithm over whole (nx, ny) slabs instead: the
-# z-loop bound comes from `size(T_col, 3)` and is therefore static, so it unrolls into a
-# few operations per level which the compiler then fuses.
+# The same Thomas algorithm as `_diffusion_kernel!`, but over whole (nx, ny) slabs, which
+# array compilers such as Reactant can trace where the element-indexing kernel cannot. The
+# z-loop bound is static, so it unrolls and fuses; the coefficients d[p] are the same for
+# every column, so no scratch arrays are needed.
 #
-# Two simplifications fall out. The tridiagonal coefficients d[p] do not depend on (i, j),
-# so they stay host scalars, and the `d_buf`/`b_buf` scratch arrays are not needed — the
-# compiler owns the temporaries. Broadcasting also covers a scalar or a field `ghf_ref`
-# without help, so `_getval` is unnecessary here.
-#
-# This form is NOT a drop-in replacement for the kernel: without a fusing compiler each
-# slab operation is a separate pass over memory (and on a GPU, a separate kernel launch),
-# which measures ~14x slower than `_diffusion_kernel!` on `CuArray`s. It is selected by
-# `TartarosReactantExt` only.
+# NOT a drop-in replacement: without a fusing compiler every slab is a separate pass over
+# memory, ~14x slower than the kernel on `CuArray`s. Selected by `TartarosReactantExt`
+# only. See `tartaros-roadmap/reactant.md`.
 function _diffusion_slabs!(
     ghf,
     T_col,
@@ -574,24 +474,5 @@ function ghf!(ghf, T_ice_base, thermo::DiffusionGHF{M,T}, dt::T) where {M,T}
         ndrange = size(ghf),
     )
     KernelAbstractions.synchronize(backend)
-    return nothing
-end
-
-function ghf!(ghf, T_ice_base, thermo::TridiagonalDiffusionGHF{M,T}, dt::T) where {M,T}
-    for I in CartesianIndices(ghf)
-        Q_deep = thermo.ghf_ref isa AbstractArray ? thermo.ghf_ref[I] : thermo.ghf_ref
-        col = @view thermo.T_col[I, :]
-        _solve_column!(
-            col,
-            Q_deep,
-            T_ice_base[I],
-            thermo.k,
-            thermo.kappa,
-            thermo.H_litho,
-            thermo.H_prod,
-            dt,
-        )
-        ghf[I] = _surface_ghf(col, thermo.k, thermo.H_litho)
-    end
     return nothing
 end
