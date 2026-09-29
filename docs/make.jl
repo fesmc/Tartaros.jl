@@ -17,6 +17,8 @@ bib = CitationBibliography(
 #     "src/examples"; credit = false)
 Literate.markdown("src/examples/ghf-models.jl",
     "src/examples"; credit = false)
+Literate.markdown("src/examples/reactant.jl",
+    "src/examples"; credit = false)
 
 
 makedocs(;
@@ -35,6 +37,7 @@ makedocs(;
         "Examples" => [
             # "Topographic correction" => "examples/greenland-correction.md",
             "Bedrock diffusion models" => "examples/ghf-models.md",
+            "Compiling with Reactant" => "examples/reactant.md",
         ],
         "API" => "API_public.md",
         "References" => "references.md",

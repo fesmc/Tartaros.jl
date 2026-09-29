@@ -7,20 +7,26 @@ authors = ["Jan Swierczek-Jereczek"]
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
-LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 NCDatasets = "85f8d34a-cbdd-5861-8df4-14fed0d494ab"
+
+[weakdeps]
+Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
+
+[extensions]
+TartarosReactantExt = "Reactant"
 
 [compat]
 DocStringExtensions = "0.9.5"
 Interpolations = "0.15,0.16"
 KernelAbstractions = "0.9.41"
-LinearAlgebra = "1.12.0"
 NCDatasets = "0.14.15"
+Reactant = "0.2.278"
 julia = "1.12"
 
 [extras]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Statistics", "Test"]
+test = ["LinearAlgebra", "Statistics", "Test"]

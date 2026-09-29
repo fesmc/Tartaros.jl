@@ -18,7 +18,6 @@ const model_inf    = InfiniteColumnGHF(ghf_ref, dT_b; k = k_b, kappa = kappa_b, 
 const model_finite = FiniteColumnGHF(  ghf_ref, dT_b; k = k_b, kappa = kappa_b, H_litho = H_b)
 
 const model_dif = DiffusionGHF(            ghf_ref, T_cold; k = k_b, kappa = kappa_b, H_litho = H_b, nz = nz_b)
-const model_tri = TridiagonalDiffusionGHF( ghf_ref, T_cold; k = k_b, kappa = kappa_b, H_litho = H_b, nz = nz_b)
 
 # ── CPU suite ──────────────────────────────────────────────────────────────────
 # Stateful models mutate internal state across samples, but per-call cost is
@@ -32,4 +31,13 @@ cpu["ThermalRelaxationGHF"]    = @benchmarkable ghf!($ghf_out, $T_warm, $model_r
 cpu["InfiniteColumnGHF"]       = @benchmarkable ghf!($ghf_out, $T_warm, $model_inf,    $dt_b)
 cpu["FiniteColumnGHF"]         = @benchmarkable ghf!($ghf_out, $T_warm, $model_finite, $dt_b)
 cpu["DiffusionGHF"]            = @benchmarkable ghf!($ghf_out, $T_warm, $model_dif,    $dt_b)
-cpu["TridiagonalDiffusionGHF"] = @benchmarkable ghf!($ghf_out, $T_warm, $model_tri,    $dt_b)
+
+# Smoothing, for comparison with the Reactant suite. The Gaussian is separable and takes
+# the two-pass path; the top-hat is not and runs the full 2D stencil.
+const z_bed_c = 1_000.0 .* rand(nx, ny)
+const dx_c    = 1_000.0
+
+cpu["smooth, ConstantSmoothingKernel"] =
+    @benchmarkable smooth($z_bed_c, $dx_c, $(ConstantSmoothingKernel(r = 3_000.0)))
+cpu["smooth, GaussianSmoothingKernel"] =
+    @benchmarkable smooth($z_bed_c, $dx_c, $(GaussianSmoothingKernel(r = 2_000.0)))

@@ -13,3 +13,4 @@ SUITE = BenchmarkGroup()
 
 include("cpu.jl")
 include("gpu.jl")
+include("reactant.jl")
